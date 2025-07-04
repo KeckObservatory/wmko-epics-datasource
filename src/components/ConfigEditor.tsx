@@ -1,71 +1,79 @@
-import React, { ChangeEvent } from 'react';
-import { InlineField, Input, SecretInput } from '@grafana/ui';
+import React, { ChangeEvent, PureComponent } from 'react';
+import { LegacyForms } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { MyDataSourceOptions, MySecureJsonData } from '../types';
+import { EPICSDataSourceOptions } from '../types';
 
-interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions, MySecureJsonData> {}
+const { FormField } = LegacyForms;
 
-export function ConfigEditor(props: Props) {
-  const { onOptionsChange, options } = props;
-  const { jsonData, secureJsonFields, secureJsonData } = options;
+interface Props extends DataSourcePluginOptionsEditorProps<EPICSDataSourceOptions> {}
 
-  const onPathChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onOptionsChange({
-      ...options,
-      jsonData: {
-        ...jsonData,
-        path: event.target.value,
-      },
-    });
+interface State {}
+
+export class ConfigEditor extends PureComponent<Props, State> {
+  onServerChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      server: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
   };
 
-  // Secure field (only sent to the backend)
-  const onAPIKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onOptionsChange({
-      ...options,
-      secureJsonData: {
-        apiKey: event.target.value,
-      },
-    });
+  onManagePortChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      managePort: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
   };
 
-  const onResetAPIKey = () => {
-    onOptionsChange({
-      ...options,
-      secureJsonFields: {
-        ...options.secureJsonFields,
-        apiKey: false,
-      },
-      secureJsonData: {
-        ...options.secureJsonData,
-        apiKey: '',
-      },
-    });
+  onDataPortChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      dataPort: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
   };
 
-  return (
-    <>
-      <InlineField label="Path" labelWidth={14} interactive tooltip={'Json field returned to frontend'}>
-        <Input
-          id="config-editor-path"
-          onChange={onPathChange}
-          value={jsonData.path}
-          placeholder="Enter the path, e.g. /api/v1"
-          width={40}
-        />
-      </InlineField>
-      <InlineField label="API Key" labelWidth={14} interactive tooltip={'Secure json field (backend only)'}>
-        <SecretInput
-          required
-          id="config-editor-api-key"
-          isConfigured={secureJsonFields.apiKey}
-          value={secureJsonData?.apiKey}
-          placeholder="Enter your API key"
-          width={40}
-          onReset={onResetAPIKey}
-          onChange={onAPIKeyChange}
-        />
-      </InlineField>
-    </>
-  );
+  render() {
+    const { options } = this.props;
+    const { jsonData } = options;
+
+    return (
+        <div className="gf-form-group">
+          <div className="gf-form">
+            <FormField
+                label="EPICS Channel archive server"
+                labelWidth={13}
+                inputWidth={20}
+                onChange={this.onServerChange}
+                value={jsonData.server || ''}
+                placeholder="k1epicsgateway"
+            />
+          </div>
+          <div className="gf-form">
+            <FormField
+                label="Management port"
+                labelWidth={13}
+                inputWidth={4}
+                onChange={this.onManagePortChange}
+                value={jsonData.managePort || ''}
+                placeholder="17665"
+            />
+          </div>
+          <div className="gf-form">
+            <FormField
+                label="Data port"
+                labelWidth={13}
+                inputWidth={4}
+                onChange={this.onDataPortChange}
+                value={jsonData.dataPort || ''}
+                placeholder="17668"
+            />
+          </div>
+        </div>
+    );
+  }
 }

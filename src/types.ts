@@ -1,34 +1,28 @@
 import { DataSourceJsonData } from '@grafana/data';
 import { DataQuery } from '@grafana/schema';
 
-export interface MyQuery extends DataQuery {
-  queryText?: string;
-  constant: number;
+export interface EPICSQuery extends DataQuery {
+  queryText: string;
+  system: string;
+  channel: string;
+  unitConversion: number;
+  transform: number;
+  disablebinning: boolean;
+  timeoffset: string;
 }
 
-export const DEFAULT_QUERY: Partial<MyQuery> = {
-  constant: 6.5,
+export const defaultQuery: Partial<EPICSQuery> = {
+  unitConversion: 0,
+  transform: 0,
+  disablebinning: false,
 };
-
-export interface DataPoint {
-  Time: number;
-  Value: number;
-}
-
-export interface DataSourceResponse {
-  datapoints: DataPoint[];
-}
+//  timeoffset: '',
 
 /**
  * These are options configured for each DataSource instance
  */
-export interface MyDataSourceOptions extends DataSourceJsonData {
-  path?: string;
-}
-
-/**
- * Value that is used in the backend, but never sent over HTTP to the frontend
- */
-export interface MySecureJsonData {
-  apiKey?: string;
+export interface EPICSDataSourceOptions extends DataSourceJsonData {
+  server: string;
+  managePort: string;
+  dataPort: string;
 }
