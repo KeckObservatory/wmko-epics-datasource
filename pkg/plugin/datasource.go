@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -156,6 +157,7 @@ type queryModel struct {
 	UnitConversion int    `json:"unitConversion"`
 	Transform      int    `json:"transform"`
 	DisableBinning bool   `json:"disablebinning"`
+	AlignT0        bool   `json:"alignt0"`
 	TimeOffset     string `json:"timeoffset"`
 	IntervalMs     int    `json:"intervalMs"`
 	MaxDataPoints  int    `json:"maxDataPoints"`
@@ -292,7 +294,7 @@ func (ds *EPICSDatasource) query(ctx context.Context, query backend.DataQuery, s
 	}
 
 	// Pull the body out of the response
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		// Send back an empty frame, the query failed in some way
 		response.Frames = append(response.Frames, empty_frame)
@@ -474,6 +476,15 @@ func (ds *EPICSDatasource) query(ctx context.Context, query backend.DataQuery, s
 			}
 
 			i++
+		}
+	}
+
+	// 2025-09-29 PMR: If the first data point is before the start of the time range, change
+	// the first time point to be exactly the start of the time range.  Guarded by a flag.
+	if qm.AlignT0 {
+		if count > 0 && pvdata[0].Data[0].Secs < query.TimeRange.From.Unix() {
+
+			times[0] = time.Unix(query.TimeRange.From.Unix(), 0)
 		}
 	}
 

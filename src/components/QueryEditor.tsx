@@ -73,6 +73,15 @@ export class QueryEditor extends PureComponent<Props> {
         onRunQuery();
     };
 
+    toggleAlignT0 = (event?: React.SyntheticEvent<HTMLInputElement>) => {
+        const { query, onChange, onRunQuery } = this.props;
+        onChange({
+            ...query,
+            alignt0: !query.alignt0,
+        });
+        onRunQuery();
+    };
+
     onTimeOffsetChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { onChange, query, onRunQuery } = this.props;
 
@@ -89,7 +98,7 @@ export class QueryEditor extends PureComponent<Props> {
         return (
             <>
                 <div className="gf-form-inline">
-                    <InlineFormLabel width={10} className="query-system" tooltip={<p>Optional: filter by system.</p>}>
+                    <InlineFormLabel width={15} className="query-system" tooltip={<p>Optional: filter by system.</p>}>
                         Channel name filter
                     </InlineFormLabel>
                     <SegmentAsync
@@ -101,7 +110,7 @@ export class QueryEditor extends PureComponent<Props> {
                     ></SegmentAsync>
                 </div>
                 <div className="gf-form-inline" style={{ marginTop: 8 }}>
-                    <InlineFormLabel width={10} className="query-channels" tooltip={<p>Select an EPICS channel.</p>}>
+                    <InlineFormLabel width={15} className="query-channels" tooltip={<p>Select an EPICS channel.</p>}>
                         Channel selection
                     </InlineFormLabel>
                     <SegmentAsync
@@ -113,7 +122,7 @@ export class QueryEditor extends PureComponent<Props> {
                     ></SegmentAsync>
                 </div>
                 <div className="gf-form-inline" style={{ marginTop: 8 }}>
-                    <InlineFormLabel width={10} className="convert-units" tooltip={<p>Convert units.</p>}>
+                    <InlineFormLabel width={15} className="convert-units" tooltip={<p>Convert units.</p>}>
                         Units conversion
                     </InlineFormLabel>
                     <Select
@@ -128,7 +137,7 @@ export class QueryEditor extends PureComponent<Props> {
                     />
                 </div>
                 <div className="gf-form-inline" style={{ marginTop: 8 }}>
-                    <InlineFormLabel width={10} className="transform" tooltip={<p>Transform data.</p>}>
+                    <InlineFormLabel width={15} className="transform" tooltip={<p>Transform data.</p>}>
                         Transform
                     </InlineFormLabel>
                     <Select
@@ -145,21 +154,30 @@ export class QueryEditor extends PureComponent<Props> {
                 <div className="gf-form-inline" style={{ marginTop: 8 }}>
                     <LegacyForms.Switch
                         label="Disable binning"
-                        labelClass={'width-10'}
+                        labelClass={'width-15'}
                         tooltip="Forces the archiver query to return every data point without binning"
                         checked={query.disablebinning === true}
                         onChange={this.toggleDisableBinning}
                     />
                 </div>
+                <div className="gf-form-inline" style={{ marginTop: 8 }}>
+                    <LegacyForms.Switch
+                        label="Align first timestamp"
+                        labelClass={'width-15'}
+                        tooltip="Automatically align the timestamp of the first data point with the start of the query"
+                        checked={query.alignt0 === true}
+                        onChange={this.toggleAlignT0}
+                    />
+                </div>
                 <div className="gf-form-group">
                     <div className="gf-form-inline">
                         <div className="gf-form">
-                            <InlineFormLabel className="set-timeoffset" tooltip="Adds a time offset, in seconds, to the Time field.">
+                            <InlineFormLabel width={15} className="set-timeoffset" tooltip="Adds a time offset, in seconds, to the Time field.">
                                 Time offset (s)
                             </InlineFormLabel>
-                            <div className="width-10">
+                            <div className="width-15">
                                 <Input
-                                    className="width-10"
+                                    className="width-15"
                                     placeholder="0"
                                     value={query.timeoffset}
                                     onChange={this.onTimeOffsetChange}
